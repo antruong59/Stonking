@@ -12,8 +12,9 @@ public class Trade implements Comparable<Trade> {
 	/**
 	 * @return Track the moment in time this Trade was created
 	 */
-	public void getCreated()
+	public long getCreated()
 	{
+		return this.created;
 	}
 	
 	public String listedCompanyCode;
@@ -21,7 +22,8 @@ public class Trade implements Comparable<Trade> {
 	/**
 	 * @return The company's code
 	 */
-	public void getCompanyCode() {
+	public String getCompanyCode() {
+		return this.listedCompanyCode;
 	}
 	
 	private int shareQuantity;
@@ -29,7 +31,8 @@ public class Trade implements Comparable<Trade> {
 	/**
 	 * @return The quantity of shares to trade
 	 */
-	public void getShareQuantity() {
+	public int getShareQuantity() {
+		return this.shareQuantity;
 	}
 
 	private StockBroker broker;
@@ -37,7 +40,8 @@ public class Trade implements Comparable<Trade> {
 	/**
 	 * @return The broker associated with this trade
 	 */
-	public void getStockBroker() {
+	public StockBroker getStockBroker() {
+		return this.broker;
 	}
 
 
@@ -48,7 +52,9 @@ public class Trade implements Comparable<Trade> {
 	{
 		created = System.nanoTime(); //do not change this
 		tradeId = id; //do not change this
-		try { Thread.sleep(100); } catch (Exception x) {}
+		try { Thread.sleep(100); } catch (Exception x) {
+			x.printStackTrace();
+		}
 	}
 	
 	/***
@@ -63,7 +69,12 @@ public class Trade implements Comparable<Trade> {
 	{
 		created = System.nanoTime(); //do not change this
 		tradeId = System.nanoTime(); //do not change this
-		try { Thread.sleep(100); } catch (Exception x) {}
+		try { Thread.sleep(100); } catch (Exception x) {
+			x.printStackTrace();
+		}
+		this.listedCompanyCode = listedCompanyCode;
+		this.broker = broker;
+		this.shareQuantity = shareQuantity;
 	}
 	
 	/**
@@ -81,8 +92,22 @@ public class Trade implements Comparable<Trade> {
 	 */
 	public int compareTo(Trade t)
 	{
+		boolean thisInList = this.broker.getWatchlist().contains(this.listedCompanyCode);
+		boolean otherInList = t.broker.getWatchlist().contains(t.listedCompanyCode);
+		
+		if (thisInList && otherInList) {
+			return 0;
+			
+		} else if (thisInList && !otherInList) {
+			return 1;
+			
+		} else if (!thisInList && otherInList) {
+			return -1;
+			
+		} else {
+			return Long.compare(this.created, t.created);
+		}
 	}
-	
 
 	/***
 	 * Do not modify this toString, it is used for testing purposes
