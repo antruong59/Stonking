@@ -79,9 +79,13 @@ public class StockBroker {
 	{
 		Trade currentTrade = null;
 		if (getPendingTradeCount() > 0) {
+			
+			// get trade
 			currentTrade = pendingTrades.peek();
+			// remove trade
 			pendingTrades.remove(currentTrade);
 		}
+		// return upcoming trade
 		return currentTrade;
 	}
 	

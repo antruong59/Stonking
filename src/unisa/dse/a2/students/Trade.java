@@ -92,7 +92,9 @@ public class Trade implements Comparable<Trade> {
 	 */
 	public int compareTo(Trade t)
 	{
+		// true if A in list, else false
 		boolean thisInList = this.broker.getWatchlist().contains(this.listedCompanyCode);
+		// true if B in list, else false
 		boolean otherInList = t.broker.getWatchlist().contains(t.listedCompanyCode);
 		
 		if (thisInList && otherInList) {

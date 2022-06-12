@@ -4,7 +4,7 @@ import unisa.dse.a2.interfaces.ListGeneric;
 
 /**
  * @author simont
- * @author An Truong
+ * @author An Truong - truan004
  */
 public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 	
@@ -22,12 +22,17 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 	//Takes a list then adds each element into a new list
 	public DSEListGeneric(DSEListGeneric<Trade> other) { // Copy constructor. 
 		DSEListGeneric<Trade> copiedList = new DSEListGeneric<Trade>();
+		
+		// assign new copied chain of node to the copiedList
+		// check if other node is empty
 		if (other.head == null) {
 			this.head = null;
 		}
 		else {
-			//Create a new node
+			// create a new node calling copyNode()
 			NodeGeneric<Trade> copiedNode = copyNode(other.head, null, other.head.next);
+			
+			// set copied node to copied list's head
 			copiedList.head = copiedNode;
 		}
 		
@@ -35,44 +40,70 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 
 	}
 	
+	/**
+	 * Copy Node using recursion
+	 * @return copied Node
+	 * 
+	 */
 	private NodeGeneric<Trade> copyNode(NodeGeneric<Trade> head, NodeGeneric<Trade> prev, NodeGeneric<Trade> next) {
 		if (head == null) {
 			return null;
 		}
 		
+		// create new node passing original node data
 		NodeGeneric<Trade> copiedNode = new NodeGeneric<Trade>(next, prev, head.get());
+		
+		// point new node prev to prev node from parameter (copy prev)
 		copiedNode.prev = prev;
+		
+		// point new node next to next node of it recursively (copy next)
 		copiedNode.next = copyNode(head.next, copiedNode, next);
 		
 		return copiedNode;
 	}
 	
+	/**
+	 * Validate whether the index of element is in range (0, size - 1)
+	 * @return boolean
+	 * 
+	 */
 	private boolean isElementIndex(int index) {
         return index >= 0 && index < this.size();
     }
 	
 	//remove and return the item at the parameter's index
 	public Trade remove(int index) {
+		
+		// throw exception to index in invalid range 
 		if (!isElementIndex(index)) {
 			throw new IndexOutOfBoundsException();
-		}
+			
+		} // throw exception to empty list
 		else if (isEmpty()) {
 			throw new NullPointerException();
 		}
+		
+		// temporary node to keep track of nodes in list
 		NodeGeneric<Trade> lastNode = null;
 		NodeGeneric<Trade> currentNode = head;
 		
+		// remove at index 0 (head)
 		if (index == 0 && head.next != null) {
 			Trade token = head.get();
+			
+			// move head to the next node
 			head.prev = null;
 			head = head.next;
 			return token;
-			
+		
+		// remove at tail position
 		} else if (index == this.size() - 1 && head.next != null) {
 			while (currentNode.next != null) {
 				lastNode = currentNode;
 				currentNode = currentNode.next;
 			}
+			
+			// move tail to the second last node
 			lastNode.next = currentNode;
 			tail = lastNode;
 			
@@ -82,6 +113,8 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 				currentNode = currentNode.next;
 			}
 			
+			// link 2 nodes around the given node with each other
+			// move given node to the next one
 			if (currentNode.next != null) {
 				lastNode.next = currentNode.next;
 				currentNode.next.prev = lastNode;
@@ -96,10 +129,13 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		int index = 0;
 		NodeGeneric<Trade> currentNode = head;
 		
+		// search for the node containing data
 		while (currentNode != null && !currentNode.get().equals(obj)) {
 			currentNode = currentNode.next;
 			index++;
 		}
+		
+		// return -1 if node is null
 		if (currentNode == null) {
 			return - 1;
 		}
@@ -112,10 +148,12 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 	public Trade get(int index) {
 		NodeGeneric<Trade> currentNode = head;
 		
+		// validate index out of range and empty list
 		if (!isElementIndex(index) || isEmpty()) {
 			return null;
 		}
 		
+		// loop through the list until reach the given index
 		int i = 0;
 		while(i < index){
 			currentNode = currentNode.next;
@@ -134,6 +172,7 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		int size = 0;
 		NodeGeneric<Trade> currentNode = head;
 		
+		// loop through and count total nodes of list
 		while (currentNode != null) {
 			currentNode = currentNode.next;
 			size++;
@@ -147,10 +186,12 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		NodeGeneric<Trade> currentNode = head;
 		String finalString = "";
 		
+		// loop through the list and convert the data of every nodes into 1 string 
 		while (currentNode != null) {
 			finalString += currentNode.get() + " ";
 			currentNode = currentNode.next;
 		}
+		// get rid of white spaces at 2 ends of string
 		return finalString.trim();
 	}
 	
@@ -160,10 +201,12 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		
 		NodeGeneric<Trade> currentNode = head;
 		
+		// obj not null and list is empty --> add first node 
 		if (obj != null && isEmpty()) {
 			head = new NodeGeneric<Trade>(null, null, obj);
 			tail = head;
 				
+		// obj not null and list not empty --> add new node to tail
 		} else if (obj != null && !isEmpty()) {
 				
 			while (currentNode.next != null) {
@@ -174,6 +217,7 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 			currentNode.next = new NodeGeneric<Trade>(null, currentNode, obj);	
 			
 		} else {
+			// can't add to list
 			addedToEnd = false;
 			throw new NullPointerException();
 			
@@ -184,6 +228,7 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 	public boolean add(int index, Trade obj) {
 		boolean addedToIndex = false;
 		
+		// validate index out of range and empty obj
 		if (obj == null) {
 			throw new NullPointerException();
 		} else if (index < 0 || index > this.size()) {
@@ -192,20 +237,24 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		
 		NodeGeneric<Trade> currentNode = head;
 		
+		// add to start --> head is new node
 		if (index == 0) {
+			
+			// empty list --> tail is head
 			if (isEmpty()) {
 				tail = currentNode;
 			}
 			
 			head = new NodeGeneric<Trade>(currentNode, null, obj);
 			
-		} 
+		} // add to end --> tail is new node
 		else if (index == this.size()) {
 			NodeGeneric<Trade> tempNode = new NodeGeneric<Trade>(null, tail, obj);
 			tail.next = tempNode;
 			tail = tempNode;
 		} 
 		else {
+			// add to 0 < index < size --> link node to node (index-1) and (index+1) 
 			for (int i = 0; i < index && currentNode != null; i++) {
 				currentNode = currentNode.next;
 			}
@@ -229,6 +278,7 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		
 		NodeGeneric<Trade> currentNode = head;
 		
+		// loop through list, validate data if exist in list
 		while (currentNode != null) {
 			if (currentNode.get().equals(obj)) {
 				elementFounded = true;
@@ -251,11 +301,13 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		NodeGeneric<Trade> prevNode = null;
 		NodeGeneric<Trade> currentNode = head;
 		
+		// search for node store that data
 		while (currentNode != null && !currentNode.get().equals(obj)) {
 			prevNode = currentNode;
 			currentNode = currentNode.next;
 		}
 		
+		// if the removed node is head
 		if (prevNode == null) {
 			head = head.next;
 			
@@ -266,6 +318,7 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 		else {
 			prevNode.next = currentNode.next;
 			
+			// if the removed node is tail
 			if (prevNode.next != null) {
 				prevNode.next.prev = prevNode;
 			}
@@ -281,14 +334,18 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 	}
 
 	@Override
+	// compare 2 list objects
 	public boolean equals(Object other) {
 		boolean isEqual = false;
 		
+		// if null  or from different classes
 		if (other == null || this.getClass() != other.getClass()) { 
 			return isEqual;
 
 		} else {
 			DSEListGeneric<Trade> otherDLL = (DSEListGeneric<Trade>) other;
+			
+			// if not same size
 			if (this.size() != otherDLL.size()) { 
 				return isEqual;
 			}
@@ -296,7 +353,8 @@ public class DSEListGeneric<Trade> implements ListGeneric<Trade> {
 			NodeGeneric<Trade> otherCurrentNode = otherDLL.head;
 			NodeGeneric<Trade> currentNode = head;
 			
-			while (isEmpty()) {
+			// loop through 2 lists, if not same nodes with same data
+			while (!isEmpty()) {
 				if (!(currentNode.get().equals(otherCurrentNode.get()))) {
 					return isEqual;
 				}

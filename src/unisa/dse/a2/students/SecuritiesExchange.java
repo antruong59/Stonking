@@ -35,6 +35,7 @@ public class SecuritiesExchange {
 	 * Initialises the exchange ready to handle brokers, announcements, and
 	 * companies
 	 * 
+	 * generate new object for companies, brokers and announcements
 	 * @param name
 	 */
 	public SecuritiesExchange(String name) {
@@ -65,13 +66,19 @@ public class SecuritiesExchange {
 	 * Adds the given broke to the list of brokers on the exchange
 	 * 
 	 * @param company
+	 * @return true if add broker, else false
 	 */
 	public boolean addBroker(StockBroker broker) {
+		// not null value
 		if (broker == null) {
 			return false;
 		}
+		
+		// add first broker
 		if (brokers == null) {
 			return brokers.add(broker);
+		
+		// add no duplicate element
 		} else if (brokers != null && !brokers.contains(broker)) {
 			return brokers.add(broker);
 		}
@@ -99,24 +106,42 @@ public class SecuritiesExchange {
 	 *                                  exchange
 	 */
 	public int processTradeRound() throws UntradedCompanyException {
+		//count number of success trade
 		int numberOfSuccessTrade = 0;
 		
+		// loop through brokers
 		for (int index = 0; index < this.brokers.size(); index++) {
+			
+			// get stock broker object from list of brokers by index
 			StockBroker broker = brokers.get(index);
+			
+			// no pending trade
 			if (broker.getPendingTradeCount() == 0)
 				continue;
+			
+			// get next trade of broker to process
 			Trade trade = broker.getNextTrade();
+			
+			// quantity of trade
 			int quantity = trade.getShareQuantity();
+			
+			// throw exception for not traded company searched by company code
 			if (!companies.containsKey(trade.getCompanyCode())) {
 				throw new UntradedCompanyException(trade.getCompanyCode());
 			}
 			
+			// companyCode, brokerName of trade and company object by company code
 			String companyCode = trade.getCompanyCode();
 			String brokerName = trade.getStockBroker().getName();
 			ListedCompany company = companies.get(companyCode);
+			
+			// process trading
 			company.processTrade(quantity);
+			
+			// get price of company
 			int price = company.getCurrentPrice();
 
+			// create announcement after trading
 			announcements.add("Trade: " + quantity + " " + companyCode + " @ " + price + " via " + brokerName);
 			numberOfSuccessTrade++;
 
